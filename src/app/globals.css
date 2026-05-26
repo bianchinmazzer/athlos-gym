@@ -1,0 +1,171 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Athlos color palette — extracted from logo */
+  --athlos-dark: #0f0f1a;
+  --athlos-navy: #16213e;
+  --athlos-coral: #e8533a;
+  --athlos-orange: #f4a340;
+  --athlos-gold: #f4c842;
+  --athlos-teal: #4ecdc4;
+  --athlos-sky: #45b7d1;
+  --athlos-white: #f0f0f0;
+  --athlos-muted: #8a8a9a;
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--athlos-dark);
+  color: var(--athlos-white);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, var(--athlos-coral), var(--athlos-orange), var(--athlos-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-teal {
+  background: linear-gradient(135deg, var(--athlos-teal), var(--athlos-sky));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Sunset gradient background */
+.gradient-sunset {
+  background: linear-gradient(
+    180deg,
+    var(--athlos-coral) 0%,
+    var(--athlos-orange) 40%,
+    var(--athlos-gold) 70%,
+    var(--athlos-teal) 100%
+  );
+}
+
+/* Card glass effect */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--athlos-navy); }
+::-webkit-scrollbar-thumb { background: var(--athlos-coral); border-radius: 3px; }
+
+/* Input styles */
+.athlos-input {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--athlos-white);
+  border-radius: 8px;
+  padding: 10px 14px;
+  width: 100%;
+  font-family: var(--font-body);
+  transition: border-color 0.2s;
+}
+
+.athlos-input:focus {
+  outline: none;
+  border-color: var(--athlos-teal);
+}
+
+.athlos-input::placeholder {
+  color: var(--athlos-muted);
+}
+
+select.athlos-input {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a8a9a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+select.athlos-input option {
+  background: var(--athlos-navy);
+  color: var(--athlos-white);
+  padding: 8px 12px;
+}
+
+/* Spinner animation */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.athlos-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+.athlos-spinner-lg {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: var(--athlos-coral);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Button styles */
+.btn-primary {
+  background: linear-gradient(135deg, var(--athlos-coral), var(--athlos-orange));
+  color: white;
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+  padding: 12px 28px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+.btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  background: transparent;
+  color: var(--athlos-teal);
+  border: 1px solid var(--athlos-teal);
+  font-family: var(--font-body);
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-secondary:hover {
+  background: var(--athlos-teal);
+  color: var(--athlos-dark);
+}
