@@ -1,5 +1,5 @@
 "use client";
-import { useState, Fragment } from "react";
+import { useState } from "react";
 import { Download, Youtube, ChevronDown, ChevronUp, Dumbbell, Layers } from "lucide-react";
 import type { RoutineWithSections, RoutineSectionWithExercises, RoutineExercise } from "@/types";
 import { generateRoutinePDF } from "@/lib/pdf";
@@ -38,23 +38,30 @@ function getSectionItems(section: RoutineSectionWithExercises) {
   return items;
 }
 
-const thStyle = {
+const gridColumns = "1fr 70px 100px 70px";
+
+const thStyle: React.CSSProperties = {
   padding: "8px 12px",
   fontFamily: "var(--font-body)",
   fontSize: "0.65rem",
   letterSpacing: "0.1em",
-  textTransform: "uppercase" as const,
+  textTransform: "uppercase",
   color: "var(--athlos-muted)",
   fontWeight: 400,
 };
 
-function ExerciseRow({ re, indent }: { re: RoutineExercise; indent?: boolean }) {
+function ExerciseRow({ re }: { re: RoutineExercise }) {
   return (
-    <tr style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-      <td style={{ padding: indent ? "10px 12px 10px 28px" : "10px 12px", fontFamily: "var(--font-body)", color: "var(--athlos-white)", fontSize: "0.9rem" }}>
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: gridColumns,
+      alignItems: "center",
+      borderTop: "1px solid rgba(255,255,255,0.04)",
+    }}>
+      <span style={{ padding: "10px 12px", fontFamily: "var(--font-body)", color: "var(--athlos-white)", fontSize: "0.9rem" }}>
         {re.exercise?.name || "—"}
-      </td>
-      <td style={{ padding: "10px 12px", textAlign: "center" }}>
+      </span>
+      <span style={{ padding: "10px 12px", textAlign: "center" }}>
         <span style={{
           display: "inline-block", minWidth: "28px", padding: "2px 8px",
           background: "rgba(244,163,64,0.12)", border: "1px solid rgba(244,163,64,0.2)",
@@ -63,11 +70,11 @@ function ExerciseRow({ re, indent }: { re: RoutineExercise; indent?: boolean }) 
         }}>
           {re.sets}
         </span>
-      </td>
-      <td style={{ padding: "10px 12px", textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.9rem", color: "var(--athlos-white)" }}>
+      </span>
+      <span style={{ padding: "10px 12px", textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.9rem", color: "var(--athlos-white)" }}>
         {re.reps}
-      </td>
-      <td style={{ padding: "10px 12px", textAlign: "center" }}>
+      </span>
+      <span style={{ padding: "10px 12px", textAlign: "center" }}>
         {re.exercise?.youtube_url ? (
           <a
             href={re.exercise.youtube_url}
@@ -90,8 +97,8 @@ function ExerciseRow({ re, indent }: { re: RoutineExercise; indent?: boolean }) 
         ) : (
           <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.8rem" }}>—</span>
         )}
-      </td>
-    </tr>
+      </span>
+    </div>
   );
 }
 
@@ -173,46 +180,56 @@ export default function RoutineList({ routines, emptyMessage, emptySubMessage }:
                       </div>
 
                       <div className="overflow-x-auto">
-                        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                          <thead>
-                            <tr>
-                              <th style={{ ...thStyle, textAlign: "left" }}>Ejercicio</th>
-                              <th style={{ ...thStyle, textAlign: "center" }}>Series</th>
-                              <th style={{ ...thStyle, textAlign: "center" }}>Reps</th>
-                              <th style={{ ...thStyle, textAlign: "center" }}>Video</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {items.map((item, idx) => {
-                              if (item.type === "exercise") {
-                                return <ExerciseRow key={`ex-${idx}`} re={item.exercise} />;
-                              }
-                              return (
-                                <Fragment key={`block-${idx}`}>
-                                  <tr style={{ borderTop: "1px solid rgba(78,205,196,0.15)" }}>
-                                    <td colSpan={4} style={{
-                                      padding: "8px 12px",
-                                      background: "rgba(78,205,196,0.06)",
-                                    }}>
-                                      <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                                        <Layers size={12} style={{ color: "var(--athlos-teal)" }} />
-                                        <span style={{
-                                          fontFamily: "var(--font-display)", fontSize: "0.8rem",
-                                          letterSpacing: "0.06em", color: "var(--athlos-teal)",
-                                        }}>
-                                          {item.name.toUpperCase()}
-                                        </span>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                  {item.exercises.map((re) => (
-                                    <ExerciseRow key={re.id} re={re} indent />
-                                  ))}
-                                </Fragment>
-                              );
-                            })}
-                          </tbody>
-                        </table>
+                        <div style={{ minWidth: "400px" }}>
+                          <div style={{
+                            display: "grid",
+                            gridTemplateColumns: gridColumns,
+                          }}>
+                            <span style={{ ...thStyle, textAlign: "left" }}>Ejercicio</span>
+                            <span style={{ ...thStyle, textAlign: "center" }}>Series</span>
+                            <span style={{ ...thStyle, textAlign: "center" }}>Reps</span>
+                            <span style={{ ...thStyle, textAlign: "center" }}>Video</span>
+                          </div>
+
+                          {items.map((item, idx) => {
+                            if (item.type === "exercise") {
+                              return <ExerciseRow key={`ex-${idx}`} re={item.exercise} />;
+                            }
+                            return (
+                              <div
+                                key={`block-${idx}`}
+                                style={{
+                                  border: "1px solid rgba(78,205,196,0.3)",
+                                  borderRadius: "10px",
+                                  marginTop: "10px",
+                                  marginBottom: "10px",
+                                  overflow: "hidden",
+                                  background: "rgba(78,205,196,0.03)",
+                                }}
+                              >
+                                <div style={{
+                                  padding: "8px 12px",
+                                  background: "rgba(78,205,196,0.08)",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: "6px",
+                                  borderBottom: "1px solid rgba(78,205,196,0.15)",
+                                }}>
+                                  <Layers size={12} style={{ color: "var(--athlos-teal)" }} />
+                                  <span style={{
+                                    fontFamily: "var(--font-display)", fontSize: "0.8rem",
+                                    letterSpacing: "0.06em", color: "var(--athlos-teal)",
+                                  }}>
+                                    {item.name.toUpperCase()}
+                                  </span>
+                                </div>
+                                {item.exercises.map((re) => (
+                                  <ExerciseRow key={re.id} re={re} />
+                                ))}
+                              </div>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   );
