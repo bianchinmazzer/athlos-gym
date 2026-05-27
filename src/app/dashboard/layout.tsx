@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import LogoutButton from "@/components/dashboard/LogoutButton";
 import DashboardNav from "@/components/dashboard/DashboardNav";
@@ -21,9 +22,16 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="min-h-screen" style={{ background: "var(--athlos-dark)" }}>
       {/* Top bar */}
       <header style={{ background: "var(--athlos-navy)", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "0 16px", height: "60px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div className="flex items-center gap-2">
-          <span style={{ fontFamily: "var(--font-display)", fontSize: "1.4rem", letterSpacing: "0.08em" }} className="gradient-text">ATHLOS</span>
-          <span style={{ fontFamily: "var(--font-body)", fontSize: "0.6rem", letterSpacing: "0.15em", color: "var(--athlos-teal)", textTransform: "uppercase" }}>GYM</span>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/images/athlos-logo.png"
+            alt="Athlos Gym"
+            width={200}
+            height={200}
+            style={{ height: "45px", width: "auto", objectFit: "contain" }}
+            priority
+          />
+          <span style={{ fontFamily: "var(--font-display)", fontSize: "1.4rem", letterSpacing: "0.08em" }} className="gradient-text">ATHLOS GYM</span>
         </div>
         <div className="flex items-center gap-4">
           <p style={{ fontFamily: "var(--font-body)", fontSize: "0.85rem", color: "var(--athlos-muted)" }}>

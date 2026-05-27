@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const emailResult = await resend.emails.send({
-      from: "Athlos Gym <onboarding@resend.dev>",
+      from: "Athlos Gym <noreply@athlosmh.com.ar>",
       to: email,
       subject: "¡Bienvenido a Athlos Gym! 💪",
       html: `
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
               </p>
             </div>
             <div style="text-align: center; margin-top: 32px;">
-              <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/login"
+              <a href="https://athlosmh.com.ar/login"
                  style="display: inline-block; background: linear-gradient(135deg, #e8533a, #f4a340); color: white; text-decoration: none; padding: 14px 36px; border-radius: 8px; font-weight: 600; letter-spacing: 0.06em; font-size: 1rem;">
                 INGRESAR A MI CUENTA
               </a>

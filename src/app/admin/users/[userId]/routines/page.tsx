@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Plus, Trash2, Pencil, ArrowLeft } from "lucide-react";
 import type { Exercise, RoutineWithSections, Profile } from "@/types";
-import RoutineBuilder, { type BuilderSection } from "@/components/admin/RoutineBuilder";
+import RoutineBuilder, { type BuilderSection, type BuilderSectionItem } from "@/components/admin/RoutineBuilder";
 
 export default function UserRoutinesPage() {
   const params = useParams();
@@ -69,6 +69,41 @@ export default function UserRoutinesPage() {
     setDeleting(false);
     setDeleteId(null);
     fetchAll();
+  };
+
+  const routineToBuilderSections = (routine: RoutineWithSections): BuilderSection[] => {
+    return (routine.routine_sections || [])
+      .sort((a, b) => a.order_index - b.order_index)
+      .map((s) => {
+        const blocks = s.section_blocks || [];
+        const allExercises = s.routine_exercises || [];
+
+        const ordered: { order: number; item: BuilderSectionItem }[] = [];
+
+        for (const ex of allExercises.filter((e) => !e.block_id)) {
+          ordered.push({
+            order: ex.order_index,
+            item: { type: "exercise", exercise_id: ex.exercise_id, sets: ex.sets, reps: ex.reps },
+          });
+        }
+
+        for (const block of blocks) {
+          const blockExes = allExercises
+            .filter((e) => e.block_id === block.id)
+            .sort((a, b) => a.order_index - b.order_index);
+          ordered.push({
+            order: block.order_index,
+            item: {
+              type: "block",
+              name: block.name,
+              exercises: blockExes.map((e) => ({ exercise_id: e.exercise_id, sets: e.sets, reps: e.reps })),
+            },
+          });
+        }
+
+        ordered.sort((a, b) => a.order - b.order);
+        return { name: s.name, items: ordered.map((o) => o.item) };
+      });
   };
 
   return (
@@ -139,18 +174,7 @@ export default function UserRoutinesPage() {
           onClose={() => { setShowBuilder(false); setEditingRoutine(null); }}
           saving={saving}
           initialName={editingRoutine?.name}
-          initialSections={
-            editingRoutine
-              ? (editingRoutine.routine_sections || [])
-                  .sort((a, b) => a.order_index - b.order_index)
-                  .map((s) => ({
-                    name: s.name,
-                    exercises: (s.routine_exercises || [])
-                      .sort((a, b) => a.order_index - b.order_index)
-                      .map((e) => ({ exercise_id: e.exercise_id, sets: e.sets, reps: e.reps })),
-                  }))
-              : undefined
-          }
+          initialSections={editingRoutine ? routineToBuilderSections(editingRoutine) : undefined}
         />
       )}
 
@@ -169,7 +193,6 @@ export default function UserRoutinesPage() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

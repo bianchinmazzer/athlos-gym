@@ -39,11 +39,20 @@ CREATE TABLE IF NOT EXISTS public.routine_sections (
   order_index INTEGER NOT NULL DEFAULT 0
 );
 
--- Exercises within each section
+-- Blocks within each section (e.g. "AMRAP 7'", "Bloque 1")
+CREATE TABLE IF NOT EXISTS public.section_blocks (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  section_id UUID REFERENCES public.routine_sections(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  order_index INTEGER NOT NULL DEFAULT 0
+);
+
+-- Exercises within each section (or within a block)
 CREATE TABLE IF NOT EXISTS public.routine_exercises (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   section_id UUID REFERENCES public.routine_sections(id) ON DELETE CASCADE,
   exercise_id UUID REFERENCES public.exercises(id) ON DELETE CASCADE,
+  block_id UUID REFERENCES public.section_blocks(id) ON DELETE CASCADE,
   sets INTEGER NOT NULL DEFAULT 3,
   reps TEXT NOT NULL DEFAULT '12-10-8',
   notes TEXT,
@@ -78,6 +87,7 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.exercises ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.routines ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.routine_sections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.section_blocks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.routine_exercises ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_routines ENABLE ROW LEVEL SECURITY;
 
@@ -106,6 +116,12 @@ CREATE POLICY "Logged in users can view sections" ON public.routine_sections
   FOR SELECT USING (auth.role() = 'authenticated');
 
 CREATE POLICY "Admin can manage sections" ON public.routine_sections
+  FOR ALL USING (public.is_admin());
+
+CREATE POLICY "Logged in users can view blocks" ON public.section_blocks
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Admin can manage blocks" ON public.section_blocks
   FOR ALL USING (public.is_admin());
 
 CREATE POLICY "Logged in users can view routine exercises" ON public.routine_exercises

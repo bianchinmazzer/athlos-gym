@@ -1,7 +1,34 @@
-import type { RoutineWithSections } from "@/types";
+import type { RoutineWithSections, RoutineSectionWithExercises, RoutineExercise } from "@/types";
+
+function getSectionItems(section: RoutineSectionWithExercises) {
+  const blocks = section.section_blocks || [];
+  const allExercises = section.routine_exercises || [];
+
+  const items: (
+    | { type: "exercise"; order: number; exercise: RoutineExercise }
+    | { type: "block"; order: number; name: string; exercises: RoutineExercise[] }
+  )[] = [];
+
+  for (const ex of allExercises.filter((e) => !e.block_id)) {
+    items.push({ type: "exercise", order: ex.order_index, exercise: ex });
+  }
+
+  for (const block of blocks) {
+    items.push({
+      type: "block",
+      order: block.order_index,
+      name: block.name,
+      exercises: allExercises
+        .filter((e) => e.block_id === block.id)
+        .sort((a, b) => a.order_index - b.order_index),
+    });
+  }
+
+  items.sort((a, b) => a.order - b.order);
+  return items;
+}
 
 export async function generateRoutinePDF(routine: RoutineWithSections) {
-  // Dynamic import to avoid SSR issues
   const { default: jsPDF } = await import("jspdf");
   const { default: autoTable } = await import("jspdf-autotable");
 
@@ -9,7 +36,6 @@ export async function generateRoutinePDF(routine: RoutineWithSections) {
 
   const DARK = [26, 26, 46] as [number, number, number];
   const CORAL = [232, 83, 58] as [number, number, number];
-  const ORANGE = [244, 163, 64] as [number, number, number];
   const TEAL = [78, 205, 196] as [number, number, number];
   const WHITE = [240, 240, 240] as [number, number, number];
   const MUTED = [138, 138, 154] as [number, number, number];
@@ -18,39 +44,32 @@ export async function generateRoutinePDF(routine: RoutineWithSections) {
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
 
-  // Background
   doc.setFillColor(...DARK);
   doc.rect(0, 0, pageW, pageH, "F");
 
-  // Header bar
   doc.setFillColor(...CORAL);
   doc.rect(0, 0, pageW, 22, "F");
 
-  // Gym name
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
   doc.setTextColor(255, 255, 255);
   doc.text("ATHLOS GYM", 14, 13);
 
-  // "Monte Hermoso" tag
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(255, 255, 255);
   doc.text("MONTE HERMOSO", pageW - 14, 13, { align: "right" });
 
-  // Routine name
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
   doc.setTextColor(...WHITE);
   doc.text(routine.name.toUpperCase(), 14, 36);
 
-  // Date
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.setTextColor(...MUTED);
   doc.text(`Generado el ${new Date().toLocaleDateString("es-AR")}`, 14, 43);
 
-  // Divider line
   doc.setDrawColor(...CORAL);
   doc.setLineWidth(0.5);
   doc.line(14, 47, pageW - 14, 47);
@@ -60,7 +79,6 @@ export async function generateRoutinePDF(routine: RoutineWithSections) {
   const sections = (routine.routine_sections || []).sort((a, b) => a.order_index - b.order_index);
 
   for (const section of sections) {
-    // Check page overflow
     if (y > pageH - 40) {
       doc.addPage();
       doc.setFillColor(...DARK);
@@ -68,7 +86,6 @@ export async function generateRoutinePDF(routine: RoutineWithSections) {
       y = 20;
     }
 
-    // Section label
     doc.setFillColor(...NAVY);
     doc.roundedRect(14, y - 5, pageW - 28, 10, 2, 2, "F");
     doc.setFont("helvetica", "bold");
@@ -77,19 +94,48 @@ export async function generateRoutinePDF(routine: RoutineWithSections) {
     doc.text(section.name.toUpperCase(), 18, y + 1);
     y += 12;
 
-    const exercises = (section.routine_exercises || []).sort((a, b) => a.order_index - b.order_index);
+    const items = getSectionItems(section);
 
-    if (exercises.length === 0) {
+    if (items.length === 0) {
       y += 4;
       continue;
     }
 
-    const tableData = exercises.map((re) => [
-      re.exercise?.name || "—",
-      String(re.sets),
-      re.reps,
-      re.exercise?.youtube_url ? "Ver en web" : "—",
-    ]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tableData: any[][] = [];
+
+    for (const item of items) {
+      if (item.type === "exercise") {
+        const re = item.exercise;
+        tableData.push([
+          re.exercise?.name || "—",
+          String(re.sets),
+          re.reps,
+          re.exercise?.youtube_url ? "Ver en web" : "—",
+        ]);
+      } else {
+        tableData.push([
+          {
+            content: `▸ ${item.name.toUpperCase()}`,
+            colSpan: 4,
+            styles: {
+              fillColor: [18, 28, 52] as [number, number, number],
+              textColor: TEAL,
+              fontStyle: "bold",
+              fontSize: 8,
+            },
+          },
+        ]);
+        for (const re of item.exercises) {
+          tableData.push([
+            `   ${re.exercise?.name || "—"}`,
+            String(re.sets),
+            re.reps,
+            re.exercise?.youtube_url ? "Ver en web" : "—",
+          ]);
+        }
+      }
+    }
 
     autoTable(doc, {
       startY: y,
@@ -119,9 +165,7 @@ export async function generateRoutinePDF(routine: RoutineWithSections) {
         3: { cellWidth: 28, halign: "center", textColor: TEAL },
       },
       alternateRowStyles: { fillColor: [20, 20, 38] as [number, number, number] },
-      didDrawPage: (data) => {
-        // Footer on each page
-        const pNum = (doc as any).internal.getNumberOfPages();
+      didDrawPage: () => {
         doc.setFillColor(...DARK);
         doc.setFont("helvetica", "normal");
         doc.setFontSize(7);

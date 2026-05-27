@@ -1,12 +1,15 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Loader2 } from "lucide-react";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [navigating, setNavigating] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -73,35 +76,46 @@ export default function Navbar() {
 
         {/* Login button */}
         <div className="hidden md:block">
-          <Link href="/login">
-            <button
-              style={{
-                background: "transparent",
-                border: "1px solid var(--athlos-coral)",
-                color: "var(--athlos-coral)",
-                fontFamily: "var(--font-display)",
-                letterSpacing: "0.08em",
-                padding: "8px 22px",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontSize: "0.95rem",
-                transition: "background 0.2s, color 0.2s",
-              }}
-              onMouseEnter={(e) => {
+          <button
+            disabled={navigating}
+            onClick={() => {
+              setNavigating(true);
+              router.push("/login");
+            }}
+            style={{
+              background: "transparent",
+              border: "1px solid var(--athlos-coral)",
+              color: "var(--athlos-coral)",
+              fontFamily: "var(--font-display)",
+              letterSpacing: "0.08em",
+              padding: "8px 22px",
+              borderRadius: "6px",
+              cursor: navigating ? "wait" : "pointer",
+              fontSize: "0.95rem",
+              transition: "background 0.2s, color 0.2s",
+              opacity: navigating ? 0.7 : 1,
+              position: "relative",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            onMouseEnter={(e) => {
+              if (!navigating) {
                 (e.currentTarget as HTMLButtonElement).style.background =
                   "var(--athlos-coral)";
                 (e.currentTarget as HTMLButtonElement).style.color = "white";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLButtonElement).style.background =
-                  "transparent";
-                (e.currentTarget as HTMLButtonElement).style.color =
-                  "var(--athlos-coral)";
-              }}
-            >
-              INGRESAR
-            </button>
-          </Link>
+              }
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background =
+                "transparent";
+              (e.currentTarget as HTMLButtonElement).style.color =
+                "var(--athlos-coral)";
+            }}
+          >
+            <span style={{ visibility: navigating ? "hidden" : "visible" }}>INGRESAR</span>
+            {navigating && <Loader2 size={16} className="animate-spin" style={{ position: "absolute" }} />}
+          </button>
         </div>
 
         {/* Mobile hamburger */}
@@ -136,9 +150,19 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
-          <Link href="/login" onClick={() => setOpen(false)}>
-            <button className="btn-primary w-full mt-2">INGRESAR</button>
-          </Link>
+          <button
+            disabled={navigating}
+            className="btn-primary w-full mt-2 flex items-center justify-center"
+            onClick={() => {
+              setOpen(false);
+              setNavigating(true);
+              router.push("/login");
+            }}
+            style={{ opacity: navigating ? 0.7 : 1, cursor: navigating ? "wait" : "pointer", position: "relative" }}
+          >
+            <span style={{ visibility: navigating ? "hidden" : "visible" }}>INGRESAR</span>
+            {navigating && <Loader2 size={16} className="animate-spin" style={{ position: "absolute" }} />}
+          </button>
         </div>
       )}
     </header>

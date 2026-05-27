@@ -22,13 +22,51 @@ export async function GET() {
         routine_exercises(
           *,
           exercise:exercises(*)
-        )
+        ),
+        section_blocks(*)
       )
     `)
     .eq("type", "general")
     .order("created_at", { ascending: false });
 
   return NextResponse.json({ routines });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function saveItems(supabase: any, sectionId: string, items: any[]) {
+  for (let itemIdx = 0; itemIdx < items.length; itemIdx++) {
+    const item = items[itemIdx];
+    if (item.type === "exercise") {
+      await supabase.from("routine_exercises").insert({
+        section_id: sectionId,
+        exercise_id: item.exercise_id,
+        sets: item.sets,
+        reps: item.reps,
+        block_id: null,
+        order_index: itemIdx,
+      });
+    } else if (item.type === "block") {
+      const { data: block } = await supabase
+        .from("section_blocks")
+        .insert({ section_id: sectionId, name: item.name, order_index: itemIdx })
+        .select()
+        .single();
+
+      if (!block) continue;
+
+      for (let eIdx = 0; eIdx < item.exercises.length; eIdx++) {
+        const ex = item.exercises[eIdx];
+        await supabase.from("routine_exercises").insert({
+          section_id: sectionId,
+          exercise_id: ex.exercise_id,
+          sets: ex.sets,
+          reps: ex.reps,
+          block_id: block.id,
+          order_index: eIdx,
+        });
+      }
+    }
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -55,16 +93,7 @@ export async function POST(req: NextRequest) {
 
     if (!section) continue;
 
-    for (let eIdx = 0; eIdx < sec.exercises.length; eIdx++) {
-      const ex = sec.exercises[eIdx];
-      await ctx.supabase.from("routine_exercises").insert({
-        section_id: section.id,
-        exercise_id: ex.exercise_id,
-        sets: ex.sets,
-        reps: ex.reps,
-        order_index: eIdx,
-      });
-    }
+    await saveItems(ctx.supabase, section.id, sec.items);
   }
 
   return NextResponse.json({ routine });
@@ -95,16 +124,7 @@ export async function PUT(req: NextRequest) {
 
     if (!section) continue;
 
-    for (let eIdx = 0; eIdx < sec.exercises.length; eIdx++) {
-      const ex = sec.exercises[eIdx];
-      await ctx.supabase.from("routine_exercises").insert({
-        section_id: section.id,
-        exercise_id: ex.exercise_id,
-        sets: ex.sets,
-        reps: ex.reps,
-        order_index: eIdx,
-      });
-    }
+    await saveItems(ctx.supabase, section.id, sec.items);
   }
 
   return NextResponse.json({ ok: true });

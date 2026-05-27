@@ -33,10 +33,18 @@ export interface RoutineSection {
   order_index: number;
 }
 
+export interface SectionBlock {
+  id: string;
+  section_id: string;
+  name: string;
+  order_index: number;
+}
+
 export interface RoutineExercise {
   id: string;
   section_id: string;
   exercise_id: string;
+  block_id: string | null;
   sets: number;
   reps: string;
   notes: string | null;
@@ -46,6 +54,7 @@ export interface RoutineExercise {
 
 export interface RoutineSectionWithExercises extends RoutineSection {
   routine_exercises: RoutineExercise[];
+  section_blocks: SectionBlock[];
 }
 
 export interface RoutineWithSections extends Routine {

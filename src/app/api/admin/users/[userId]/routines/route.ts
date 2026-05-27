@@ -9,6 +9,43 @@ async function getAdminSupabase() {
   return profile?.role === "admin" ? { supabase, user } : null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function saveItems(supabase: any, sectionId: string, items: any[]) {
+  for (let itemIdx = 0; itemIdx < items.length; itemIdx++) {
+    const item = items[itemIdx];
+    if (item.type === "exercise") {
+      await supabase.from("routine_exercises").insert({
+        section_id: sectionId,
+        exercise_id: item.exercise_id,
+        sets: item.sets,
+        reps: item.reps,
+        block_id: null,
+        order_index: itemIdx,
+      });
+    } else if (item.type === "block") {
+      const { data: block } = await supabase
+        .from("section_blocks")
+        .insert({ section_id: sectionId, name: item.name, order_index: itemIdx })
+        .select()
+        .single();
+
+      if (!block) continue;
+
+      for (let eIdx = 0; eIdx < item.exercises.length; eIdx++) {
+        const ex = item.exercises[eIdx];
+        await supabase.from("routine_exercises").insert({
+          section_id: sectionId,
+          exercise_id: ex.exercise_id,
+          sets: ex.sets,
+          reps: ex.reps,
+          block_id: block.id,
+          order_index: eIdx,
+        });
+      }
+    }
+  }
+}
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ userId: string }> }) {
   const ctx = await getAdminSupabase();
   if (!ctx) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
@@ -25,7 +62,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ user
           routine_exercises(
             *,
             exercise:exercises(*)
-          )
+          ),
+          section_blocks(*)
         )
       )
     `)
@@ -61,16 +99,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ use
 
     if (!section) continue;
 
-    for (let eIdx = 0; eIdx < sec.exercises.length; eIdx++) {
-      const ex = sec.exercises[eIdx];
-      await ctx.supabase.from("routine_exercises").insert({
-        section_id: section.id,
-        exercise_id: ex.exercise_id,
-        sets: ex.sets,
-        reps: ex.reps,
-        order_index: eIdx,
-      });
-    }
+    await saveItems(ctx.supabase, section.id, sec.items);
   }
 
   await ctx.supabase.from("user_routines").insert({ user_id: userId, routine_id: routine.id });
@@ -104,16 +133,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ user
 
     if (!section) continue;
 
-    for (let eIdx = 0; eIdx < sec.exercises.length; eIdx++) {
-      const ex = sec.exercises[eIdx];
-      await ctx.supabase.from("routine_exercises").insert({
-        section_id: section.id,
-        exercise_id: ex.exercise_id,
-        sets: ex.sets,
-        reps: ex.reps,
-        order_index: eIdx,
-      });
-    }
+    await saveItems(ctx.supabase, section.id, sec.items);
   }
 
   return NextResponse.json({ ok: true });

@@ -15,7 +15,8 @@ export async function GET() {
         routine_exercises(
           *,
           exercise:exercises(*)
-        )
+        ),
+        section_blocks(*)
       )
     `)
     .eq("type", "general")

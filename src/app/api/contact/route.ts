@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     }
 
     await resend.emails.send({
-      from: "Athlos Gym Web <noreply@athlosgym.com>",
+      from: "Athlos Gym Web <noreply@athlosmh.com.ar>",
       to: process.env.CONTACT_EMAIL!,
       replyTo: email,
       subject: `Nuevo mensaje de ${name} — Athlos Gym`,
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
           <div style="margin-top: 24px; padding: 16px; background: rgba(255,255,255,0.04); border-radius: 8px; border-left: 3px solid #e8533a;">
             <p style="margin: 0; white-space: pre-wrap;">${message}</p>
           </div>
-          <p style="margin-top: 24px; color: #8a8a9a; font-size: 12px;">Este email fue enviado desde athlosgym.com</p>
+          <p style="margin-top: 24px; color: #8a8a9a; font-size: 12px;">Este email fue enviado desde athlosmh.com.ar</p>
         </div>
       `,
     });
