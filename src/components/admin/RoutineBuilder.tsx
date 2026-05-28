@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Plus, Trash2, X, Check, Layers } from "lucide-react";
 import type { Exercise } from "@/types";
 
@@ -38,8 +38,11 @@ function SearchableSelect({ exercises, value, onChange }: {
   const ref = useRef<HTMLDivElement>(null);
 
   const selected = exercises.find((e) => e.id === value);
-  const filtered = exercises.filter((e) =>
-    e.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = useMemo(() =>
+    exercises.filter((e) =>
+      e.name.toLowerCase().includes(search.toLowerCase())
+    ),
+    [exercises, search]
   );
 
   useEffect(() => {
@@ -120,7 +123,7 @@ export default function RoutineBuilder({
   );
 
   const update = (fn: (draft: BuilderSection[]) => void) => {
-    const copy = JSON.parse(JSON.stringify(sections)) as BuilderSection[];
+    const copy = structuredClone(sections);
     fn(copy);
     setSections(copy);
   };

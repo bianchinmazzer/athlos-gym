@@ -1,16 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-
-async function getAdminSupabase() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-  return profile?.role === "admin" ? { supabase, user } : null;
-}
+import { requireAdmin } from "@/lib/admin";
+import { saveItems } from "@/lib/routines";
 
 export async function GET() {
-  const ctx = await getAdminSupabase();
+  const ctx = await requireAdmin();
   if (!ctx) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const { data: routines } = await ctx.supabase
@@ -32,45 +25,8 @@ export async function GET() {
   return NextResponse.json({ routines });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function saveItems(supabase: any, sectionId: string, items: any[]) {
-  for (let itemIdx = 0; itemIdx < items.length; itemIdx++) {
-    const item = items[itemIdx];
-    if (item.type === "exercise") {
-      await supabase.from("routine_exercises").insert({
-        section_id: sectionId,
-        exercise_id: item.exercise_id,
-        sets: item.sets,
-        reps: item.reps,
-        block_id: null,
-        order_index: itemIdx,
-      });
-    } else if (item.type === "block") {
-      const { data: block } = await supabase
-        .from("section_blocks")
-        .insert({ section_id: sectionId, name: item.name, order_index: itemIdx })
-        .select()
-        .single();
-
-      if (!block) continue;
-
-      for (let eIdx = 0; eIdx < item.exercises.length; eIdx++) {
-        const ex = item.exercises[eIdx];
-        await supabase.from("routine_exercises").insert({
-          section_id: sectionId,
-          exercise_id: ex.exercise_id,
-          sets: ex.sets,
-          reps: ex.reps,
-          block_id: block.id,
-          order_index: eIdx,
-        });
-      }
-    }
-  }
-}
-
 export async function POST(req: NextRequest) {
-  const ctx = await getAdminSupabase();
+  const ctx = await requireAdmin();
   if (!ctx) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const { name, description, sections } = await req.json();
@@ -100,7 +56,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const ctx = await getAdminSupabase();
+  const ctx = await requireAdmin();
   if (!ctx) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const { id, name, sections } = await req.json();
@@ -131,7 +87,7 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const ctx = await getAdminSupabase();
+  const ctx = await requireAdmin();
   if (!ctx) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const { id } = await req.json();

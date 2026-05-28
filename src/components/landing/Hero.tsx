@@ -1,5 +1,4 @@
-"use client";
-import Link from "next/link";
+import Image from "next/image";
 
 export default function Hero() {
   return (
@@ -7,15 +6,13 @@ export default function Hero() {
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
       style={{ background: "var(--athlos-dark)" }}
     >
-      {/* Background photo */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: "url('/assets/hero.jpeg')",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
+      <Image
+        src="/assets/hero.jpeg"
+        alt="Athlos Gym"
+        fill
+        priority
+        sizes="100vw"
+        style={{ objectFit: "cover", objectPosition: "center" }}
       />
       {/* Dark overlay on top of image */}
       <div
@@ -132,24 +129,6 @@ export default function Hero() {
         </svg>
       </div>
 
-      <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(24px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeInDown {
-          from { opacity: 0; transform: translateY(-16px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes pulse-slow {
-          0%, 100% { transform: translateX(-50%) scale(1); opacity: 0.18; }
-          50% { transform: translateX(-50%) scale(1.08); opacity: 0.25; }
-        }
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.3; }
-        }
-      `}</style>
     </section>
   );
 }

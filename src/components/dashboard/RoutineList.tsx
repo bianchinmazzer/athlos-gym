@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Download, Youtube, ChevronDown, ChevronUp, Dumbbell, Layers } from "lucide-react";
 import type { RoutineWithSections, RoutineSectionWithExercises, RoutineExercise } from "@/types";
-import { generateRoutinePDF } from "@/lib/pdf";
 
 interface RoutineListProps {
   routines: RoutineWithSections[];
@@ -38,10 +37,7 @@ function getSectionItems(section: RoutineSectionWithExercises) {
   return items;
 }
 
-const gridColumns = "1fr 70px 100px 70px";
-
 const thStyle: React.CSSProperties = {
-  padding: "8px 12px",
   fontFamily: "var(--font-body)",
   fontSize: "0.65rem",
   letterSpacing: "0.1em",
@@ -52,16 +48,11 @@ const thStyle: React.CSSProperties = {
 
 function ExerciseRow({ re }: { re: RoutineExercise }) {
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: gridColumns,
-      alignItems: "center",
-      borderTop: "1px solid rgba(255,255,255,0.04)",
-    }}>
-      <span style={{ padding: "10px 12px", fontFamily: "var(--font-body)", color: "var(--athlos-white)", fontSize: "0.9rem" }}>
+    <div className="routine-grid" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+      <span className="routine-cell" style={{ fontFamily: "var(--font-body)", color: "var(--athlos-white)", fontSize: "0.9rem" }}>
         {re.exercise?.name || "—"}
       </span>
-      <span style={{ padding: "10px 12px", textAlign: "center" }}>
+      <span className="routine-cell" style={{ textAlign: "center" }}>
         <span style={{
           display: "inline-block", minWidth: "28px", padding: "2px 8px",
           background: "rgba(244,163,64,0.12)", border: "1px solid rgba(244,163,64,0.2)",
@@ -71,10 +62,10 @@ function ExerciseRow({ re }: { re: RoutineExercise }) {
           {re.sets}
         </span>
       </span>
-      <span style={{ padding: "10px 12px", textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.9rem", color: "var(--athlos-white)" }}>
+      <span className="routine-cell" style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.9rem", color: "var(--athlos-white)" }}>
         {re.reps}
       </span>
-      <span style={{ padding: "10px 12px", textAlign: "center" }}>
+      <span className="routine-cell" style={{ textAlign: "center" }}>
         {re.exercise?.youtube_url ? (
           <a
             href={re.exercise.youtube_url}
@@ -84,7 +75,7 @@ function ExerciseRow({ re }: { re: RoutineExercise }) {
               display: "inline-flex", alignItems: "center", gap: "4px",
               color: "var(--athlos-coral)", textDecoration: "none",
               fontFamily: "var(--font-body)", fontSize: "0.8rem",
-              padding: "4px 10px", borderRadius: "6px",
+              padding: "4px 8px", borderRadius: "6px",
               border: "1px solid rgba(232,83,58,0.25)",
               transition: "background 0.15s",
             }}
@@ -92,7 +83,7 @@ function ExerciseRow({ re }: { re: RoutineExercise }) {
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
           >
             <Youtube size={12} />
-            Ver
+            <span className="video-label">Ver</span>
           </a>
         ) : (
           <span style={{ color: "rgba(255,255,255,0.15)", fontSize: "0.8rem" }}>—</span>
@@ -138,7 +129,7 @@ export default function RoutineList({ routines, emptyMessage, emptySubMessage }:
             </div>
             <div className="flex items-center gap-3">
               <button
-                onClick={(e) => { e.stopPropagation(); generateRoutinePDF(routine); }}
+                onClick={async (e) => { e.stopPropagation(); const { generateRoutinePDF } = await import("@/lib/pdf"); generateRoutinePDF(routine); }}
                 style={{
                   display: "flex", alignItems: "center", gap: "6px", padding: "8px 14px",
                   border: "1px solid rgba(78,205,196,0.3)", borderRadius: "8px",
@@ -179,57 +170,52 @@ export default function RoutineList({ routines, emptyMessage, emptySubMessage }:
                         </span>
                       </div>
 
-                      <div className="overflow-x-auto">
-                        <div style={{ minWidth: "400px" }}>
-                          <div style={{
-                            display: "grid",
-                            gridTemplateColumns: gridColumns,
-                          }}>
-                            <span style={{ ...thStyle, textAlign: "left" }}>Ejercicio</span>
-                            <span style={{ ...thStyle, textAlign: "center" }}>Series</span>
-                            <span style={{ ...thStyle, textAlign: "center" }}>Reps</span>
-                            <span style={{ ...thStyle, textAlign: "center" }}>Video</span>
-                          </div>
-
-                          {items.map((item, idx) => {
-                            if (item.type === "exercise") {
-                              return <ExerciseRow key={`ex-${idx}`} re={item.exercise} />;
-                            }
-                            return (
-                              <div
-                                key={`block-${idx}`}
-                                style={{
-                                  border: "1px solid rgba(78,205,196,0.3)",
-                                  borderRadius: "10px",
-                                  marginTop: "10px",
-                                  marginBottom: "10px",
-                                  overflow: "hidden",
-                                  background: "rgba(78,205,196,0.03)",
-                                }}
-                              >
-                                <div style={{
-                                  padding: "8px 12px",
-                                  background: "rgba(78,205,196,0.08)",
-                                  display: "flex",
-                                  alignItems: "center",
-                                  gap: "6px",
-                                  borderBottom: "1px solid rgba(78,205,196,0.15)",
-                                }}>
-                                  <Layers size={12} style={{ color: "var(--athlos-teal)" }} />
-                                  <span style={{
-                                    fontFamily: "var(--font-display)", fontSize: "0.8rem",
-                                    letterSpacing: "0.06em", color: "var(--athlos-teal)",
-                                  }}>
-                                    {item.name.toUpperCase()}
-                                  </span>
-                                </div>
-                                {item.exercises.map((re) => (
-                                  <ExerciseRow key={re.id} re={re} />
-                                ))}
-                              </div>
-                            );
-                          })}
+                      <div>
+                        <div className="routine-grid">
+                          <span style={{ ...thStyle, textAlign: "left", padding: "8px 6px" }}>Ejercicio</span>
+                          <span style={{ ...thStyle, textAlign: "center", padding: "8px 6px" }}>Series</span>
+                          <span style={{ ...thStyle, textAlign: "center", padding: "8px 6px" }}>Reps</span>
+                          <span style={{ ...thStyle, textAlign: "center", padding: "8px 6px" }}>Video</span>
                         </div>
+
+                        {items.map((item, idx) => {
+                          if (item.type === "exercise") {
+                            return <ExerciseRow key={`ex-${idx}`} re={item.exercise} />;
+                          }
+                          return (
+                            <div
+                              key={`block-${idx}`}
+                              style={{
+                                border: "1px solid rgba(78,205,196,0.3)",
+                                borderRadius: "10px",
+                                marginTop: "10px",
+                                marginBottom: "10px",
+                                overflow: "hidden",
+                                background: "rgba(78,205,196,0.03)",
+                              }}
+                            >
+                              <div style={{
+                                padding: "8px 12px",
+                                background: "rgba(78,205,196,0.08)",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "6px",
+                                borderBottom: "1px solid rgba(78,205,196,0.15)",
+                              }}>
+                                <Layers size={12} style={{ color: "var(--athlos-teal)" }} />
+                                <span style={{
+                                  fontFamily: "var(--font-display)", fontSize: "0.8rem",
+                                  letterSpacing: "0.06em", color: "var(--athlos-teal)",
+                                }}>
+                                  {item.name.toUpperCase()}
+                                </span>
+                              </div>
+                              {item.exercises.map((re) => (
+                                <ExerciseRow key={re.id} re={re} />
+                              ))}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );

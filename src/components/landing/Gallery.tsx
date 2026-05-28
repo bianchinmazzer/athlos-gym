@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { X, Play } from "lucide-react";
+import Image from "next/image";
 
 type GalleryItem = {
   id: number;
@@ -112,12 +113,12 @@ export default function Gallery() {
                   </div>
                 </>
               ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <Image
                   src={item.src}
                   alt={item.alt}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  fill
+                  sizes="(max-width: 640px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
               )}
               {/* Hover overlay */}
@@ -169,12 +170,15 @@ export default function Gallery() {
                   style={{ maxHeight: "80vh" }}
                 />
               ) : (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={items[selected].src}
-                  alt={items[selected].alt}
-                  className="w-full h-auto"
-                />
+                <div className="relative" style={{ width: "100%", height: "80vh" }}>
+                  <Image
+                    src={items[selected].src}
+                    alt={items[selected].alt}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 768px"
+                    className="object-contain"
+                  />
+                </div>
               )}
             </div>
           </div>

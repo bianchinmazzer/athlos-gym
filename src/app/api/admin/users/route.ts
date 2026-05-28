@@ -1,23 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/admin";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-async function requireAdmin() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-  return profile?.role === "admin" ? user : null;
-}
-
 export async function GET() {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  const ctx = await requireAdmin();
+  if (!ctx) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
-  const supabase = await createClient();
-  const { data: users } = await supabase
+  const { data: users } = await ctx.supabase
     .from("profiles")
     .select("*")
     .order("created_at", { ascending: false });
@@ -26,8 +18,8 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  const ctx = await requireAdmin();
+  if (!ctx) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const { name, email, password, role } = await req.json();
   if (!name || !email || !password) return NextResponse.json({ error: "Faltan campos" }, { status: 400 });
@@ -103,8 +95,8 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  const ctx = await requireAdmin();
+  if (!ctx) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const { id, name, role, password } = await req.json();
   const adminClient = await createAdminClient();
@@ -121,8 +113,8 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const admin = await requireAdmin();
-  if (!admin) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+  const ctx = await requireAdmin();
+  if (!ctx) return NextResponse.json({ error: "No autorizado" }, { status: 401 });
 
   const { id } = await req.json();
   const adminClient = await createAdminClient();

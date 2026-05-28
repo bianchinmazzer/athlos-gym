@@ -1,5 +1,3 @@
-"use client";
-
 import { Dumbbell, Monitor, Users, MapPin } from "lucide-react";
 
 const services = [
@@ -98,19 +96,10 @@ export default function Services() {
             return (
               <div
                 key={svc.title}
-                className="rounded-2xl p-6 sm:p-8 flex flex-col gap-5 relative overflow-hidden"
+                className="service-card rounded-2xl p-6 sm:p-8 flex flex-col gap-5 relative overflow-hidden"
                 style={{
                   background: svc.gradient,
                   border: `1px solid ${svc.border}`,
-                  transition: "transform 0.2s, box-shadow 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)";
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = `0 20px 60px rgba(0,0,0,0.3)`;
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.transform = "none";
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
                 }}
               >
                 {/* Tag */}

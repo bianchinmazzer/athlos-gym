@@ -1,5 +1,3 @@
-"use client";
-
 export default function WhatsAppFloat() {
   const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5491112345678";
   const message = encodeURIComponent(
@@ -13,6 +11,7 @@ export default function WhatsAppFloat() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
+      className="whatsapp-float"
       style={{
         position: "fixed",
         bottom: "24px",
@@ -26,20 +25,8 @@ export default function WhatsAppFloat() {
         alignItems: "center",
         justifyContent: "center",
         boxShadow: "0 4px 20px rgba(37,211,102,0.4)",
-        transition: "transform 0.2s, box-shadow 0.2s",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLAnchorElement).style.transform = "scale(1.1)";
-        (e.currentTarget as HTMLAnchorElement).style.boxShadow =
-          "0 6px 28px rgba(37,211,102,0.55)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLAnchorElement).style.transform = "scale(1)";
-        (e.currentTarget as HTMLAnchorElement).style.boxShadow =
-          "0 4px 20px rgba(37,211,102,0.4)";
       }}
     >
-      {/* WhatsApp SVG icon */}
       <svg
         viewBox="0 0 24 24"
         fill="white"
