@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function FounderStory() {
   return (
     <section
@@ -46,20 +48,22 @@ export default function FounderStory() {
               <div className="flex items-center gap-3">
                 <div
                   style={{
-                    width: "40px",
-                    height: "40px",
+                    width: "72px",
+                    height: "72px",
                     borderRadius: "50%",
-                    background: "linear-gradient(135deg, var(--athlos-coral), var(--athlos-orange))",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontFamily: "var(--font-display)",
-                    fontSize: "1.1rem",
-                    color: "white",
+                    overflow: "hidden",
                     flexShrink: 0,
+                    border: "2px solid var(--athlos-orange)",
+                    position: "relative",
                   }}
                 >
-                  A
+                  <Image
+                    src="/images/founder.jpeg"
+                    alt="Fundador de Athlos Gym"
+                    fill
+                    sizes="72px"
+                    style={{ objectFit: "cover", objectPosition: "center 25%" }}
+                  />
                 </div>
                 <div>
                   <p style={{ fontFamily: "var(--font-body)", fontWeight: 600, fontSize: "0.9rem", color: "var(--athlos-white)" }}>
@@ -76,8 +80,8 @@ export default function FounderStory() {
             <div className="grid grid-cols-3 gap-4 mt-6">
               {[
                 { value: "5+", label: "Años de experiencia" },
-                { value: "100%", label: "Atención personalizada" },
-                { value: "∞", label: "Ganas de crecer" },
+                { value: "100%", label: "Entrenamientos grupales y rutinas personalizadas" },
+                { value: "💪", label: "Ganas de crecer", isEmoji: true },
               ].map((stat) => (
                 <div
                   key={stat.label}
@@ -89,6 +93,15 @@ export default function FounderStory() {
                       fontSize: "1.8rem",
                       color: "var(--athlos-orange)",
                       lineHeight: 1,
+                      ...(stat.isEmoji
+                        ? {
+                            fontSize: "1.3rem",
+                            background: "var(--athlos-orange)",
+                            WebkitBackgroundClip: "text",
+                            backgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                          }
+                        : {}),
                     }}
                   >
                     {stat.value}
@@ -133,7 +146,7 @@ export default function FounderStory() {
                 color: "var(--athlos-white)",
               }}
             >
-              DE BAHÍA BLANCA
+              DE LA PAMPA
               <br />
               <span className="gradient-text">AL MAR</span>
             </h2>
@@ -149,22 +162,25 @@ export default function FounderStory() {
               }}
             >
               <p>
-                Todo empezó en Bahía Blanca, donde me formé como entrenador y
-                trabajé en gimnasios durante años. La pasión por el entrenamiento
-                y por ayudar a la gente a transformarse siempre estuvo.
+                A los 15 años empecé el gym y desde ese entonces el
+                entrenamiento y el deporte se volvieron un estilo de vida.
               </p>
               <p>
-                Cuando me mudé a Monte Hermoso, la pandemia me encontró con
-                ganas de seguir pero sin lugar. El living de mi casa se convirtió
-                en el primer <span style={{ color: "var(--athlos-white)" }}>Athlos Gym</span>.
-                Barras, mancuernas, y mucho esfuerzo compartido.
+                Decidí que esta pasión también sería mi profesión y me mudé a
+                Bahía Blanca donde me formé como profesor y entrenador, me
+                capacité y trabajé en diferentes gimnasios.
               </p>
               <p>
-                Hoy tenemos un espacio propio, completamente equipado, a metros
-                de la playa. Y seguimos creciendo — ahora también con{" "}
+                Años más tarde la vida me llevó a Monte Hermoso y el living de
+                mi casa se convirtió en el primer{" "}
+                <span style={{ color: "var(--athlos-white)" }}>Athlos Gym</span>.
+              </p>
+              <p>
+                Hoy tenemos un espacio propio completamente equipado junto al
+                mar. Y seguimos creciendo, ahora también con{" "}
                 <span style={{ color: "var(--athlos-white)" }}>rutinas online</span> para
-                que puedas entrenar desde donde estés, con la misma calidad de
-                siempre.
+                que puedas entrenar desde donde estés, con la misma calidad y
+                energía de siempre.
               </p>
             </div>
           </div>

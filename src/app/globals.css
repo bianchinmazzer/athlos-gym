@@ -198,9 +198,11 @@ select.athlos-input option {
 }
 .routine-cell { padding: 9px 6px; }
 .video-label { display: none; }
+.routine-reps { font-size: 0.72rem; line-height: 1.2; }
 
 @media (min-width: 640px) {
   .routine-grid { grid-template-columns: 1fr 70px 100px 70px; }
   .routine-cell { padding: 10px 12px; }
   .video-label { display: inline; }
+  .routine-reps { font-size: 0.9rem; }
 }

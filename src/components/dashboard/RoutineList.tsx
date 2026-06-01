@@ -62,7 +62,7 @@ function ExerciseRow({ re }: { re: RoutineExercise }) {
           {re.sets}
         </span>
       </span>
-      <span className="routine-cell" style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: "0.9rem", color: "var(--athlos-white)" }}>
+      <span className="routine-cell routine-reps" style={{ textAlign: "center", fontFamily: "var(--font-body)", color: "var(--athlos-white)" }}>
         {re.reps}
       </span>
       <span className="routine-cell" style={{ textAlign: "center" }}>

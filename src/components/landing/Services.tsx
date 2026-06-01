@@ -1,37 +1,37 @@
-import { Dumbbell, Monitor, Users, MapPin } from "lucide-react";
+import { Users, Monitor, MapPin } from "lucide-react";
 
-const services = [
-  {
-    icon: Dumbbell,
-    title: "Gimnasio Libre Guiado",
-    color: "var(--athlos-coral)",
-    gradient: "linear-gradient(135deg, rgba(232,83,58,0.15), rgba(244,163,64,0.08))",
-    border: "rgba(232,83,58,0.25)",
-    description:
-      "Entrená en nuestro gym completamente equipado con la supervisión directa del profesor. Pesas, máquinas, cardio — todo lo que necesitás para avanzar.",
-    bullets: [
-      "Equipamiento completo de musculación",
-      "Supervisión y corrección técnica",
-      "Adaptación del plan a tu nivel",
-      "Horarios flexibles",
-    ],
-    tag: "PRESENCIAL",
-  },
+type Section = { heading: string; text: string };
+
+type Service = {
+  icon: typeof Users;
+  title: string;
+  color: string;
+  gradient: string;
+  border: string;
+  tag: string;
+  highlight?: boolean;
+  description?: string;
+  sections?: Section[];
+};
+
+const services: Service[] = [
   {
     icon: Users,
-    title: "Clases Grupales",
+    title: "Presencial",
     color: "var(--athlos-orange)",
     gradient: "linear-gradient(135deg, rgba(244,163,64,0.15), rgba(244,200,66,0.08))",
     border: "rgba(244,163,64,0.25)",
-    description:
-      "Sesiones grupales con dinámica motivadora. El esfuerzo compartido potencia los resultados. Ideal para quienes buscan energía de equipo.",
-    bullets: [
-      "Grupos reducidos de hasta 8 personas",
-      "Variedad de modalidades",
-      "Dinámica motivacional",
-      "Progresión estructurada",
-    ],
     tag: "PRESENCIAL",
+    sections: [
+      {
+        heading: "Clases grupales",
+        text: "Sesiones grupales con dinámica motivadora, el esfuerzo compartido potencia los resultados. Ideal para quienes buscan energía de equipo.",
+      },
+      {
+        heading: "Open box",
+        text: "Pensado para que entrenes tu rutina de manera individual con supervisión del profesor.",
+      },
+    ],
   },
   {
     icon: Monitor,
@@ -39,16 +39,10 @@ const services = [
     color: "var(--athlos-teal)",
     gradient: "linear-gradient(135deg, rgba(78,205,196,0.15), rgba(69,183,209,0.08))",
     border: "rgba(78,205,196,0.25)",
-    description:
-      "Rutinas diseñadas a medida, accesibles desde cualquier dispositivo. Videos explicativos por ejercicio para que nunca tengas dudas sobre la ejecución.",
-    bullets: [
-      "Rutinas personalizadas por el profe",
-      "Videos de cada ejercicio",
-      "Descarga en PDF para llevar al gym",
-      "Seguimiento desde la app",
-    ],
     tag: "ONLINE",
     highlight: true,
+    description:
+      "Entrenamientos personalizados orientados a tus objetivos, con videos explicativos de cada ejercicio para que puedas realizarlo desde cualquier lugar.",
   },
 ];
 
@@ -61,7 +55,7 @@ export default function Services() {
         padding: "clamp(64px, 10vw, 120px) 0",
       }}
     >
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16">
           <p
@@ -90,7 +84,7 @@ export default function Services() {
         </div>
 
         {/* Cards */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid sm:grid-cols-2 gap-6">
           {services.map((svc) => {
             const Icon = svc.icon;
             return (
@@ -166,36 +160,50 @@ export default function Services() {
                   {svc.title.toUpperCase()}
                 </h3>
 
-                {/* Description */}
-                <p
-                  style={{
-                    fontFamily: "var(--font-body)",
-                    fontSize: "0.9rem",
-                    lineHeight: "1.7",
-                    color: "var(--athlos-muted)",
-                    flexGrow: 1,
-                  }}
-                >
-                  {svc.description}
-                </p>
+                {/* Sections (presencial) */}
+                {svc.sections && (
+                  <div className="flex flex-col gap-5">
+                    {svc.sections.map((sec) => (
+                      <div key={sec.heading}>
+                        <h4
+                          style={{
+                            fontFamily: "var(--font-display)",
+                            fontSize: "1.1rem",
+                            letterSpacing: "0.03em",
+                            color: svc.color,
+                            marginBottom: "6px",
+                          }}
+                        >
+                          {sec.heading}
+                        </h4>
+                        <p
+                          style={{
+                            fontFamily: "var(--font-body)",
+                            fontSize: "0.9rem",
+                            lineHeight: "1.7",
+                            color: "var(--athlos-muted)",
+                          }}
+                        >
+                          {sec.text}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
-                {/* Bullets */}
-                <ul className="flex flex-col gap-2">
-                  {svc.bullets.map((b) => (
-                    <li
-                      key={b}
-                      className="flex items-center gap-2"
-                      style={{
-                        fontFamily: "var(--font-body)",
-                        fontSize: "0.82rem",
-                        color: "rgba(240,240,240,0.75)",
-                      }}
-                    >
-                      <span style={{ color: svc.color, flexShrink: 0 }}>✓</span>
-                      {b}
-                    </li>
-                  ))}
-                </ul>
+                {/* Description (online) */}
+                {svc.description && (
+                  <p
+                    style={{
+                      fontFamily: "var(--font-body)",
+                      fontSize: "0.9rem",
+                      lineHeight: "1.7",
+                      color: "var(--athlos-muted)",
+                    }}
+                  >
+                    {svc.description}
+                  </p>
+                )}
               </div>
             );
           })}

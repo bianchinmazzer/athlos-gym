@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Footer() {
   return (
     <footer
@@ -9,28 +11,37 @@ export default function Footer() {
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <span
-              style={{
-                fontFamily: "var(--font-display)",
-                fontSize: "1.6rem",
-                letterSpacing: "0.08em",
-              }}
-              className="gradient-text"
-            >
-              ATHLOS
-            </span>
-            <span
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "0.6rem",
-                letterSpacing: "0.15em",
-                color: "var(--athlos-teal)",
-                textTransform: "uppercase",
-              }}
-            >
-              GYM
-            </span>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/images/athlos-logo.png"
+              alt="Athlos Gym"
+              width={120}
+              height={120}
+              style={{ height: "56px", width: "auto", objectFit: "contain" }}
+            />
+            <div className="flex items-center gap-2">
+              <span
+                style={{
+                  fontFamily: "var(--font-display)",
+                  fontSize: "1.6rem",
+                  letterSpacing: "0.08em",
+                }}
+                className="gradient-text"
+              >
+                ATHLOS
+              </span>
+              <span
+                style={{
+                  fontFamily: "var(--font-body)",
+                  fontSize: "0.6rem",
+                  letterSpacing: "0.15em",
+                  color: "var(--athlos-teal)",
+                  textTransform: "uppercase",
+                }}
+              >
+                GYM
+              </span>
+            </div>
           </div>
 
           <p
